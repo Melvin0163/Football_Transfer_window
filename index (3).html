@@ -1,0 +1,1064 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Football Transfer Window | Ultimate Manager Challenge</title>
+    
+    <!-- Google Fonts: Bebas Neue (Sports), Montserrat (Body), Orbitron (Tech Numbers) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Montserrat:wght@300;400;600;800&family=Orbitron:wght@500;700;900&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        /* --- CSS VARIABLES & THEME --- */
+        :root {
+            --primary-bg: #050505;
+            --neon-green: #00FF9C;
+            --electric-blue: #00AFFF;
+            --gold: #FFD700;
+            --glass-bg: rgba(10, 10, 10, 0.75);
+            --glass-border: rgba(255, 255, 255, 0.15);
+            
+            /* Fonts */
+            --font-head: 'Bebas Neue', sans-serif;
+            --font-body: 'Montserrat', sans-serif;
+            --font-num: 'Orbitron', sans-serif;
+        }
+
+        /* --- GLOBAL STYLES --- */
+        body {
+            font-family: var(--font-body);
+            background-color: var(--primary-bg);
+            color: #ffffff;
+            overflow-x: hidden;
+            margin: 0;
+            padding: 0;
+            scroll-behavior: smooth;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        h1, h2, h3, h4, h5, .sports-font {
+            font-family: var(--font-head);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        
+        .num-font {
+            font-family: var(--font-num);
+            letter-spacing: 1px;
+        }
+
+        /* Hide Scrollbar for Horizontal Mobile Menus */
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* --- BACKGROUND VIDEO & OVERLAY --- */
+        .video-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -2;
+            overflow: hidden;
+            background: #000;
+        }
+        .video-background video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+            opacity: 0.4;
+        }
+        .overlay-gradient {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+            background: linear-gradient(to bottom, rgba(5, 5, 5, 0.6) 0%, rgba(5, 5, 5, 0.98) 100%);
+            pointer-events: none;
+        }
+
+        /* --- JERSEY FABRIC TEXTURES --- */
+        .jersey-mesh {
+            background-image: radial-gradient(rgba(255, 255, 255, 0.15) 1px, transparent 1px);
+            background-size: 5px 5px;
+        }
+        .jersey-mesh-dark {
+            background-image: radial-gradient(rgba(0, 0, 0, 0.3) 1px, transparent 1px);
+            background-size: 5px 5px;
+        }
+
+        /* Kit Patterns for Leagues */
+        .kit-epl { background: linear-gradient(135deg, #6CABDD 0%, #6CABDD 100%); border-top: 15px solid #FFF; } 
+        .kit-laliga { background: #FFFFFF; border-top: 15px solid var(--gold); } 
+        .kit-seriea { background: repeating-linear-gradient(90deg, #000, #000 25px, #fff 25px, #fff 50px); } 
+        .kit-bundes { background: repeating-linear-gradient(90deg, #FDE100, #FDE100 25px, #000 25px, #000 50px); } 
+        .kit-ligue1 { background: linear-gradient(90deg, #004170 40%, #DA291C 40%, #DA291C 60%, #004170 60%); } 
+
+        /* --- INTRO ANIMATION --- */
+        .intro-overlay {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: #050505; z-index: 9999;
+            display: flex; justify-content: center; align-items: center;
+            transition: opacity 0.5s ease-out;
+            perspective: 1000px;
+            overflow: hidden;
+        }
+        .shake-container {
+            width: 100%; height: 100%;
+            display: flex; justify-content: center; align-items: center;
+            animation: screenShake 2s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+        }
+        .football-anim {
+            width: clamp(120px, 30vw, 180px); 
+            height: clamp(120px, 30vw, 180px);
+            filter: drop-shadow(0 0 40px var(--neon-green));
+            animation: ballFlyIn 2s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+            transform-style: preserve-3d;
+        }
+        .flash-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: #fff; opacity: 0; pointer-events: none;
+            animation: flashEffect 2s ease-out forwards;
+        }
+        
+        @keyframes ballFlyIn {
+            0% { transform: scale(0.1) translateZ(-1000px) translateY(-50vh) rotate(-1080deg); opacity: 0; filter: blur(10px); }
+            15% { transform: scale(0.5) translateZ(-500px) translateY(10vh) rotate(-720deg); opacity: 1; filter: blur(2px); }
+            25% { transform: scale(0.4) translateZ(-600px) translateY(15vh) rotate(-750deg); filter: blur(0px); } 
+            35% { transform: scale(2) translateZ(0px) translateY(0) rotate(0deg); filter: blur(0px); } 
+            40% { transform: scale(2) translateZ(0px) translateY(0) rotate(0deg); filter: blur(0px); } 
+            100% { transform: scale(60) translateZ(1000px) translateY(20vh) rotate(500deg); opacity: 0; filter: blur(20px); } 
+        }
+        @keyframes screenShake {
+            0%, 34% { transform: translate(0, 0) rotate(0deg); }
+            35% { transform: translate(-20px, 10px) rotate(-2deg); }
+            37% { transform: translate(20px, -10px) rotate(2deg); }
+            39% { transform: translate(-10px, 5px) rotate(-1deg); }
+            41% { transform: translate(10px, -5px) rotate(1deg); }
+            43%, 100% { transform: translate(0, 0) rotate(0deg); }
+        }
+        @keyframes flashEffect {
+            0%, 34% { opacity: 0; }
+            35% { opacity: 1; }
+            45% { opacity: 0; }
+            100% { opacity: 0; }
+        }
+
+        /* --- GAME THEME RULEBOOK TABS --- */
+        @keyframes fadeInSlide {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fadeIn { animation: fadeInSlide 0.4s ease-out forwards; }
+        
+        /* Desktop vs Mobile active tab borders */
+        .rule-tab.active {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+        }
+        @media (min-width: 768px) {
+            .rule-tab.active { border-left-color: var(--neon-green); border-bottom-color: transparent; }
+        }
+        @media (max-width: 767px) {
+            .rule-tab.active { border-bottom-color: var(--neon-green); border-left-color: transparent; }
+        }
+        .rule-tab.active i {
+            color: var(--neon-green);
+            opacity: 1;
+        }
+
+        /* --- UTILITIES & GLOWS (EA FC SHARP STYLE) --- */
+        .glass-panel {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 4px; /* Sharper edges for FIFA aesthetic */
+            box-shadow: 0 10px 40px 0 rgba(0, 0, 0, 0.8);
+        }
+
+        .glow-text-green { text-shadow: 0 0 15px var(--neon-green); }
+        .glow-text-blue { text-shadow: 0 0 15px var(--electric-blue); }
+        
+        .btn-sport {
+            background: #fff;
+            color: #000;
+            text-transform: uppercase;
+            font-family: var(--font-head);
+            letter-spacing: 2px;
+            border: 2px solid #fff;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            transform: skew(-8deg); /* FIFA sharp skewed button */
+            border-radius: 2px;
+        }
+        .btn-sport:hover {
+            background: var(--neon-green);
+            border-color: var(--neon-green);
+            box-shadow: 0 0 20px rgba(0, 255, 156, 0.5);
+            transform: skew(-8deg) scale(1.02);
+        }
+        .btn-sport span, .btn-sport i {
+            display: inline-block;
+            transform: skew(8deg); /* Unskew text */
+        }
+
+        /* --- SCROLL REVEAL ANIMATIONS --- */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* --- TACTICS PITCH & SHIRTS (RESPONSIVE) --- */
+        .pitch {
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+            aspect-ratio: 2 / 3;
+            background: repeating-linear-gradient(
+                0deg,
+                #12351d,
+                #12351d 10%,
+                #184526 10%,
+                #184526 20%
+            );
+            border: 3px solid #fff;
+            margin: 0 auto;
+            border-radius: 2px;
+            overflow: hidden;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.9);
+        }
+        .pitch-lines {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+        }
+        .halfway-line {
+            position: absolute;
+            top: 50%; width: 100%; height: 3px; background: rgba(255,255,255,0.7);
+            transform: translateY(-50%);
+        }
+        .center-circle {
+            position: absolute;
+            top: 50%; left: 50%; width: 25%; aspect-ratio: 1/1;
+            border: 3px solid rgba(255,255,255,0.7);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+        }
+        .penalty-box-top, .penalty-box-bottom {
+            position: absolute;
+            left: 20%; width: 60%; height: 15%;
+            border: 3px solid rgba(255,255,255,0.7);
+        }
+        .penalty-box-top { top: 0; border-top: none; }
+        .penalty-box-bottom { bottom: 0; border-bottom: none; }
+        
+        /* Jersey Shape for Pitch Players - Clamped for Mobile */
+        .clip-jersey {
+            clip-path: polygon(20% 0%, 80% 0%, 100% 20%, 85% 35%, 75% 25%, 75% 100%, 25% 100%, 25% 25%, 15% 35%, 0% 20%);
+        }
+        .player-shirt {
+            position: absolute;
+            width: clamp(28px, 9vw, 42px);
+            height: clamp(28px, 9vw, 42px);
+            background: var(--gold);
+            transform: translate(-50%, -50%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: transform 0.2s, filter 0.2s;
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.8));
+        }
+        .player-shirt:hover {
+            transform: translate(-50%, -50%) scale(1.2);
+            z-index: 10;
+            background: var(--neon-green);
+        }
+        .player-shirt span {
+            font-family: var(--font-num);
+            font-weight: 900;
+            color: #000;
+            font-size: clamp(0.7rem, 2.5vw, 1rem);
+            margin-top: 15%; /* Push down into torso */
+        }
+
+        /* --- BUDGET PROGRESS BAR --- */
+        .progress-bar-bg {
+            background: rgba(255,255,255,0.1);
+            border-radius: 2px;
+            overflow: hidden;
+            height: clamp(20px, 4vw, 30px);
+            position: relative;
+            border: 1px solid #333;
+        }
+        .progress-bar-fill {
+            height: 100%;
+            background: repeating-linear-gradient(
+                45deg,
+                var(--neon-green),
+                var(--neon-green) 10px,
+                #00cc7d 10px,
+                #00cc7d 20px
+            );
+            width: 0%; 
+            transition: width 1.5s cubic-bezier(0.1, 0.7, 0.1, 1);
+            position: relative;
+            box-shadow: 0 0 15px rgba(0,255,156,0.6);
+        }
+        
+        /* Arc Text container for Jersey */
+        .arc-text {
+            text-align: center;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+            padding-bottom: 5px;
+            width: 80%;
+            margin: 0 auto;
+        }
+
+        /* --- TESSERACT & FLOATING ELEMENTS --- */
+        .tesseract-wrapper {
+            perspective: 800px;
+            width: clamp(40px, 6vw, 60px);
+            height: clamp(40px, 6vw, 60px);
+        }
+        .tesseract {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            animation: spin-tesseract 10s infinite linear;
+        }
+        .cube-outer, .cube-inner {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            transform-style: preserve-3d;
+        }
+        .cube-inner {
+            transform: scale(0.45);
+        }
+        .t-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border: 2px solid var(--electric-blue);
+            background: rgba(0, 175, 255, 0.1);
+            box-shadow: 0 0 15px rgba(0, 175, 255, 0.5), inset 0 0 15px rgba(0, 175, 255, 0.5);
+        }
+        /* Calculations for a 100% width/height cube */
+        .t-face.front  { transform: translateZ(calc(clamp(40px, 6vw, 60px) / 2)); }
+        .t-face.back   { transform: rotateY(180deg) translateZ(calc(clamp(40px, 6vw, 60px) / 2)); }
+        .t-face.right  { transform: rotateY(90deg) translateZ(calc(clamp(40px, 6vw, 60px) / 2)); }
+        .t-face.left   { transform: rotateY(-90deg) translateZ(calc(clamp(40px, 6vw, 60px) / 2)); }
+        .t-face.top    { transform: rotateX(90deg) translateZ(calc(clamp(40px, 6vw, 60px) / 2)); }
+        .t-face.bottom { transform: rotateX(-90deg) translateZ(calc(clamp(40px, 6vw, 60px) / 2)); }
+        
+        @keyframes spin-tesseract {
+            0% { transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg); }
+            100% { transform: rotateX(360deg) rotateY(360deg) rotateZ(180deg); }
+        }
+
+        .floating-slow { animation: float 6s ease-in-out infinite; }
+        .floating-medium { animation: float 4s ease-in-out infinite; }
+        .floating-fast { animation: float 3s ease-in-out infinite; }
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+    </style>
+</head>
+<body class="antialiased">
+
+    <!-- 0. INTRO FOOTBALL KICK ANIMATION -->
+    <div id="intro-overlay" class="intro-overlay">
+        <div class="shake-container">
+            <!-- Detailed 3D Shaded Football SVG -->
+            <svg class="football-anim" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+              <defs>
+                <radialGradient id="sphere" cx="35%" cy="30%" r="60%">
+                  <stop offset="0%" stop-color="#ffffff"/>
+                  <stop offset="60%" stop-color="#d0d0d0"/>
+                  <stop offset="100%" stop-color="#555555"/>
+                </radialGradient>
+              </defs>
+              <circle cx="50" cy="50" r="48" fill="url(#sphere)"/>
+              <path fill="#1a1a1a" d="M50 15l18 12 4 21-14 18H42L28 48l4-21z"/>
+              <path fill="#1a1a1a" d="M15 35l-10 12v20l18 9 5-18-13-23zm70 0l10 12v20l-18 9-5-18 13-23zm-50 50l15 13 15-13-8-15h-14l-8 15zM42 2l8-2 8 2v10H42V2z"/>
+              <path fill="none" stroke="#1a1a1a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" d="M50 15V2 M68 27l18-12 M72 48l23 9 M58 66l17 20 M42 66L25 86 M28 48L5 57 M32 27L14 15 M50 15l18 12 4 21-14 18H42L28 48l4-21z"/>
+            </svg>
+        </div>
+        <div class="flash-overlay"></div>
+    </div>
+
+    <!-- 1. BACKGROUND -->
+    <div class="video-background">
+        <!-- Cinematic Stadium Video -->
+        <video autoplay muted loop playsinline poster="https://images.unsplash.com/photo-1518605368461-1ee51688d08b?q=80&w=2070&auto=format&fit=crop">
+            <source src="https://videos.pexels.com/video-files/3187272/3187272-uhd_2560_1440_25fps.mp4" type="video/mp4">
+        </video>
+    </div>
+    <div class="overlay-gradient"></div>
+
+    <!-- HEADER: LOGO & TESSERACT -->
+    <header class="absolute top-0 left-0 w-full flex justify-between items-center py-6 px-4 md:py-8 md:px-6 z-50 pointer-events-none">
+        <!-- VIT Logo (Left) -->
+        <a href="https://vtopcc.vit.ac.in/" target="_blank" class="pointer-events-auto -ml-1 md:-ml-2">
+            <img src="https://chennai.vit.ac.in/files/icbcc2022/images/index/VIT%20LOGO%20transparent.png" onerror="this.src='https://vit.ac.in/system/files/uploads/VIT_Logo.png'" alt="VIT Chennai Logo" class="h-10 md:h-16 w-auto object-contain filter brightness-0 invert drop-shadow-[0_0_10px_rgba(255,255,255,0.4)] hover:scale-105 transition-transform">
+        </a>
+        
+        <!-- Glowing Tesseract (Right) -->
+        <div class="pointer-events-auto">
+            <div class="tesseract-wrapper">
+                <div class="tesseract">
+                    <!-- Outer Cube -->
+                    <div class="cube-outer">
+                        <div class="t-face front"></div>
+                        <div class="t-face back"></div>
+                        <div class="t-face right"></div>
+                        <div class="t-face left"></div>
+                        <div class="t-face top"></div>
+                        <div class="t-face bottom"></div>
+                    </div>
+                    <!-- Inner Cube -->
+                    <div class="cube-inner">
+                        <div class="t-face front"></div>
+                        <div class="t-face back"></div>
+                        <div class="t-face right"></div>
+                        <div class="t-face left"></div>
+                        <div class="t-face top"></div>
+                        <div class="t-face bottom"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT WRAPPER -->
+    <div class="relative z-10 pt-12 md:pt-20 px-4 md:px-12 lg:px-24 pb-24 max-w-[1440px] mx-auto flex flex-col gap-16 md:gap-32">
+
+        <!-- 2. HERO SECTION -->
+        <section class="min-h-[75vh] md:min-h-[85vh] flex flex-col justify-center items-center text-center reveal pt-4 relative">
+            
+            <!-- Football Tactical Floating Elements -->
+            <div class="absolute inset-0 overflow-hidden pointer-events-none z-[-1]">
+                <!-- Tactical Pass Arrow -->
+                <svg class="absolute top-[20%] left-[10%] w-24 h-24 md:w-32 md:h-32 text-white opacity-20 floating-slow" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1"><path stroke-linecap="round" stroke-linejoin="round" d="M15 15l6-6m0 0l-6-6m6 6H9a6 6 0 000 12h3" /></svg>
+                <!-- Player Node ST -->
+                <div class="absolute top-[35%] right-[15%] w-12 h-12 md:w-16 md:h-16 rounded-full border-2 border-[#FFD700] bg-[#FFD700]/10 opacity-40 floating-fast flex items-center justify-center shadow-[0_0_15px_rgba(255,215,0,0.4)]"><span class="text-[#FFD700] sports-font text-xs md:text-sm">ST</span></div>
+                <!-- Player Zone Radius -->
+                <div class="absolute bottom-[20%] left-[15%] w-20 h-20 md:w-28 md:h-28 rounded-full border-2 border-dashed border-[#00AFFF] opacity-30 floating-medium"></div>
+                <!-- Tactical Cross / Target -->
+                <svg class="absolute bottom-[25%] right-[20%] w-16 h-16 md:w-20 md:h-20 text-[#00FF9C] opacity-20 floating-slow" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+            </div>
+            
+            <h1 class="text-[4.5rem] leading-[0.9] sm:text-8xl md:text-9xl lg:text-[11rem] sports-font mb-4 text-white drop-shadow-[0_10px_20px_rgba(0,0,0,0.8)] glow-text-blue break-words w-full">
+                TRANSFER<br/><span class="text-transparent bg-clip-text bg-gradient-to-r from-gray-100 to-gray-500">WINDOW</span>
+            </h1>
+            
+            <p class="text-base md:text-2xl font-light mb-10 text-gray-300 max-w-2xl font-body px-2">
+                Build the ultimate squad. Master the auction. <br class="hidden md:block"/> Dominate the football transfer market.
+            </p>
+
+            <a href="https://docs.google.com/forms/d/e/1FAIpQLSe0hIcfLeqoIcGPIkiZO6V5cfU85g8nNAgFjAdWMBBeDRLHMw/viewform" target="_blank" class="btn-sport inline-flex text-lg md:text-2xl px-8 md:px-12 py-4 items-center gap-3 decoration-transparent">
+                <span>REGISTER NOW</span> <i data-lucide="arrow-right" class="w-5 h-5 md:w-6 md:h-6"></i>
+            </a>
+        </section>
+
+        <!-- 3. PARTICIPATION SPECS (Jersey Themed Cards) -->
+        <section class="reveal">
+            <div class="text-center mb-10">
+                <h2 class="text-4xl md:text-6xl sports-font border-b-2 border-gray-800 pb-2 inline-block">Event Rules</h2>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
+                <div class="glass-panel p-6 md:p-8 text-center relative overflow-hidden group border-b-4 border-b-[#00FF9C]">
+                    <div class="absolute inset-0 jersey-mesh opacity-20 z-0"></div>
+                    <div class="relative z-10">
+                        <div class="w-16 h-16 md:w-20 md:h-20 mx-auto bg-black border border-[#00FF9C] rounded-sm flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                            <i data-lucide="users" class="w-8 h-8 md:w-10 md:h-10 text-[#00FF9C]"></i>
+                        </div>
+                        <h3 class="sports-font text-2xl md:text-3xl mb-1 md:mb-2">Management</h3>
+                        <p class="text-gray-400 text-sm md:text-base">Max <span class="text-white font-bold num-font">3</span> Students per club.</p>
+                    </div>
+                </div>
+                
+                <div class="glass-panel p-6 md:p-8 text-center relative overflow-hidden group border-b-4 border-b-[#00AFFF]">
+                    <div class="absolute inset-0 jersey-mesh opacity-20 z-0"></div>
+                    <div class="relative z-10">
+                        <div class="w-16 h-16 md:w-20 md:h-20 mx-auto bg-black border border-[#00AFFF] rounded-sm flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                            <i data-lucide="shirt" class="w-8 h-8 md:w-10 md:h-10 text-[#00AFFF]"></i>
+                        </div>
+                        <h3 class="sports-font text-2xl md:text-3xl mb-1 md:mb-2">Roster Size</h3>
+                        <p class="text-gray-400 text-sm md:text-base"><span class="text-white font-bold num-font">15-18</span> Players required.</p>
+                    </div>
+                </div>
+                
+                <div class="glass-panel p-6 md:p-8 text-center relative overflow-hidden group border-b-4 border-b-[#FFD700]">
+                    <div class="absolute inset-0 jersey-mesh opacity-20 z-0"></div>
+                    <div class="relative z-10">
+                        <div class="w-16 h-16 md:w-20 md:h-20 mx-auto bg-black border border-[#FFD700] rounded-sm flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                            <i data-lucide="coins" class="w-8 h-8 md:w-10 md:h-10 text-[#FFD700]"></i>
+                        </div>
+                        <h3 class="sports-font text-2xl md:text-3xl mb-1 md:mb-2">Base Budget</h3>
+                        <p class="text-gray-400 text-sm md:text-base"><span class="text-white font-bold num-font">150M</span> Starting Balance.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 5. CLUB SELECTION (KIT THEMED) -->
+        <section class="reveal">
+            <h2 class="text-4xl md:text-6xl mb-2 md:mb-4 text-center sports-font">Select Your Franchise</h2>
+            <p class="text-center text-gray-400 mb-8 text-sm md:text-lg px-4">Draft order is determined by the Quiz Round results.</p>
+            
+            <div class="grid grid-cols-2 md:grid-cols-5 gap-4 md:gap-6">
+                <!-- Premier League Kit -->
+                <div class="kit-epl relative h-36 md:h-48 rounded flex flex-col items-center justify-center shadow-lg border border-gray-600 hover:-translate-y-2 transition-transform cursor-pointer overflow-hidden group">
+                    <div class="absolute inset-0 jersey-mesh opacity-30"></div>
+                    <div class="absolute top-0 w-12 md:w-16 h-3 md:h-4 bg-black rounded-b-full"></div>
+                    <h3 class="sports-font text-xl md:text-2xl z-10 text-black drop-shadow-md group-hover:scale-110 transition-transform">PREMIER</h3>
+                    <div class="num-font text-2xl md:text-4xl text-white font-black drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)] mt-1 md:mt-2">ENG</div>
+                </div>
+
+                <!-- La Liga Kit -->
+                <div class="kit-laliga relative h-36 md:h-48 rounded flex flex-col items-center justify-center shadow-lg border border-gray-600 hover:-translate-y-2 transition-transform cursor-pointer overflow-hidden group">
+                    <div class="absolute inset-0 jersey-mesh opacity-50"></div>
+                    <div class="absolute top-0 w-12 md:w-16 h-3 md:h-4 bg-black rounded-b-full"></div>
+                    <h3 class="sports-font text-xl md:text-2xl z-10 text-black drop-shadow-md group-hover:scale-110 transition-transform">LA LIGA</h3>
+                    <div class="num-font text-2xl md:text-4xl text-[#D4AF37] font-black drop-shadow-[0_1px_1px_rgba(0,0,0,0.3)] mt-1 md:mt-2">ESP</div>
+                </div>
+
+                <!-- Serie A Kit -->
+                <div class="kit-seriea relative h-36 md:h-48 rounded flex flex-col items-center justify-center shadow-lg border border-gray-600 hover:-translate-y-2 transition-transform cursor-pointer overflow-hidden group">
+                    <div class="absolute inset-0 jersey-mesh-dark opacity-40"></div>
+                    <div class="absolute top-0 w-12 md:w-16 h-3 md:h-4 bg-white rounded-b-full"></div>
+                    <div class="bg-black/80 px-2 py-1 rounded-sm z-10 group-hover:scale-110 transition-transform text-center mt-2 md:mt-4">
+                        <h3 class="sports-font text-xl md:text-2xl text-white">SERIE A</h3>
+                    </div>
+                    <div class="num-font text-2xl md:text-4xl text-[#FFD700] font-black drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)] mt-1 md:mt-2 z-10">ITA</div>
+                </div>
+
+                <!-- Bundesliga Kit -->
+                <div class="kit-bundes relative h-36 md:h-48 rounded flex flex-col items-center justify-center shadow-lg border border-gray-600 hover:-translate-y-2 transition-transform cursor-pointer overflow-hidden group">
+                    <div class="absolute inset-0 jersey-mesh-dark opacity-30"></div>
+                    <div class="absolute top-0 w-12 md:w-16 h-3 md:h-4 bg-black rounded-b-full"></div>
+                    <div class="bg-black/90 px-2 py-1 rounded-sm z-10 group-hover:scale-110 transition-transform text-center mt-2 md:mt-4 border border-[#FDE100]">
+                        <h3 class="sports-font text-xl md:text-2xl text-white">BUNDESLIGA</h3>
+                    </div>
+                    <div class="num-font text-2xl md:text-4xl text-white font-black drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)] mt-1 md:mt-2 z-10">GER</div>
+                </div>
+
+                <!-- Ligue 1 Kit -->
+                <div class="kit-ligue1 relative h-36 md:h-48 rounded flex flex-col items-center justify-center shadow-lg border border-gray-600 hover:-translate-y-2 transition-transform cursor-pointer overflow-hidden group col-span-2 md:col-span-1">
+                    <div class="absolute inset-0 jersey-mesh opacity-40"></div>
+                    <div class="absolute top-0 w-12 md:w-16 h-3 md:h-4 bg-white rounded-b-full"></div>
+                    <h3 class="sports-font text-xl md:text-2xl z-10 text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] group-hover:scale-110 transition-transform">LIGUE 1</h3>
+                    <div class="num-font text-2xl md:text-4xl text-white font-black drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] mt-1 md:mt-2 z-10">FRA</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 6. BUDGET SYSTEM VISUALIZER -->
+        <section class="reveal grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center bg-black/60 backdrop-blur-md p-6 md:p-12 rounded border border-gray-800 shadow-2xl">
+            <div>
+                <h2 class="text-4xl md:text-6xl mb-4 md:mb-6 sports-font glow-text-green text-[#00FF9C]">Financial Control</h2>
+                <p class="text-gray-300 text-sm md:text-lg mb-6 leading-relaxed">
+                    Balance the books. Base budget is <span class="num-font text-[#FFD700] text-lg md:text-xl">150M</span>. 
+                    Perform well in the Quiz Round to increase your transfer war chest.
+                </p>
+                
+                <div class="space-y-3 md:space-y-4 font-bold">
+                    <div class="flex items-center justify-between bg-[#111] p-3 md:p-4 rounded-sm border-l-4 border-l-[#00FF9C]">
+                        <span class="sports-font text-lg md:text-xl text-gray-200">Easy Quiz Bonus</span>
+                        <span class="num-font text-[#00FF9C] text-lg md:text-xl">+ 5M</span>
+                    </div>
+                    <div class="flex items-center justify-between bg-[#111] p-3 md:p-4 rounded-sm border-l-4 border-l-[#00AFFF]">
+                        <span class="sports-font text-lg md:text-xl text-gray-200">Medium Quiz Bonus</span>
+                        <span class="num-font text-[#00AFFF] text-lg md:text-xl">+ 10M</span>
+                    </div>
+                    <div class="flex items-center justify-between bg-[#111] p-3 md:p-4 rounded-sm border-l-4 border-l-[#FFD700]">
+                        <span class="sports-font text-lg md:text-xl text-gray-200">Hard Quiz Bonus</span>
+                        <span class="num-font text-[#FFD700] text-lg md:text-xl">+ 20M</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="glass-panel p-6 md:p-10 relative overflow-hidden group border border-gray-700">
+                <div class="absolute -right-10 -top-10 w-40 h-40 bg-[#00FF9C] opacity-10 rounded-full blur-3xl"></div>
+                
+                <h3 class="sports-font text-2xl md:text-3xl mb-6 flex justify-between border-b border-gray-700 pb-3">
+                    <span>REMAINING FUNDS</span>
+                    <span class="text-[#00FF9C] num-font" id="budget-display">150.0M</span>
+                </h3>
+                
+                <div class="mb-6 md:mb-8">
+                    <div class="progress-bar-bg" id="budget-bar-container">
+                        <div class="progress-bar-fill" id="budget-fill" style="width: 0%;"></div>
+                    </div>
+                    <div class="flex justify-between text-xs md:text-sm mt-2 md:mt-3 num-font text-gray-500 font-bold">
+                        <span>0M</span>
+                        <span>MAX BUDGET</span>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4 md:gap-6">
+                    <div class="bg-black/80 p-4 md:p-6 rounded-sm border border-gray-800 text-center">
+                        <span class="block sports-font text-gray-500 mb-1 md:mb-2 text-sm md:text-lg">SPENT</span>
+                        <span class="text-2xl md:text-3xl num-font text-red-500" id="spent-display">0.0M</span>
+                    </div>
+                    <div class="bg-black/80 p-4 md:p-6 rounded-sm border border-gray-800 text-center">
+                        <span class="block sports-font text-gray-500 mb-1 md:mb-2 text-sm md:text-lg">SQUAD VALUE</span>
+                        <span class="text-2xl md:text-3xl num-font text-[#FFD700]">85.5M</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 7. PLAYER AUCTION (JERSEY THEMED CARDS) -->
+        <section class="reveal">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 md:mb-12 border-b border-gray-800 pb-4 gap-4">
+                <div>
+                    <h2 class="text-4xl md:text-6xl sports-font text-white">Live <span class="text-[#FFD700]">Auction</span> Board</h2>
+                    <p class="text-gray-400 mt-1 md:mt-2 text-sm md:text-lg">Sealed-bid system. Highest bid secures the jersey.</p>
+                </div>
+                <div class="bg-red-600/20 px-4 md:px-6 py-2 border border-red-500 text-red-500 flex items-center gap-2 md:gap-3 rounded-sm">
+                    <span class="relative flex h-3 w-3 md:h-4 md:w-4">
+                      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                      <span class="relative inline-flex rounded-full h-3 w-3 md:h-4 md:w-4 bg-red-500"></span>
+                    </span>
+                    <span class="sports-font text-lg md:text-xl tracking-widest">BIDS OPEN</span>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
+                <!-- Auction Jersey 1 -->
+                <div class="glass-panel overflow-hidden border border-gray-700 relative group bg-[#112233] hover:border-[#00FF9C] transition-colors rounded-sm">
+                    <div class="absolute inset-0 jersey-mesh opacity-30"></div>
+                    <div class="absolute top-0 left-1/2 -translate-x-1/2 w-20 md:w-24 h-5 md:h-6 bg-black rounded-b-full border-b border-gray-600 z-10"></div>
+                    
+                    <div class="relative z-10 p-5 md:p-6 flex flex-col h-full items-center justify-between text-center pt-8 md:pt-10">
+                        <div class="w-full">
+                            <h3 class="sports-font text-2xl md:text-3xl tracking-widest uppercase arc-text text-white shadow-black drop-shadow-md">OSIMHEN</h3>
+                            <div class="text-7xl md:text-[7rem] leading-none num-font text-white drop-shadow-[0_4px_4px_rgba(0,0,0,0.8)] font-black my-2 md:my-4">9</div>
+                            <span class="bg-[#00FF9C] text-black sports-font px-2 py-1 md:px-3 rounded-sm text-sm md:text-lg">ST</span>
+                        </div>
+                        
+                        <div class="w-full bg-black/90 p-3 md:p-4 rounded-sm border border-gray-700 mt-6 backdrop-blur-md">
+                            <div class="flex justify-between items-center mb-3 md:mb-4 text-xs md:text-sm border-b border-gray-800 pb-2">
+                                <span class="sports-font text-gray-400 text-base md:text-lg">EST. VALUE</span>
+                                <span class="num-font text-[#00FF9C] text-lg md:text-xl font-bold">€110M</span>
+                            </div>
+                            <button class="bid-btn w-full py-2 md:py-3 bg-[#1a1a1a] border border-gray-600 hover:border-[#00FF9C] hover:text-[#00FF9C] transition-colors rounded-sm sports-font text-lg md:text-xl tracking-wider">
+                                SUBMIT BID
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Auction Jersey 2 -->
+                <div class="glass-panel overflow-hidden border border-gray-700 relative group bg-gradient-to-b from-[#A50044] to-[#004D98] hover:border-[#00FF9C] transition-colors rounded-sm">
+                    <div class="absolute inset-0 jersey-mesh opacity-40"></div>
+                    <div class="absolute top-0 left-1/2 -translate-x-1/2 w-20 md:w-24 h-5 md:h-6 bg-yellow-400 rounded-b-full border-b border-gray-600 z-10"></div>
+                    
+                    <div class="relative z-10 p-5 md:p-6 flex flex-col h-full items-center justify-between text-center pt-8 md:pt-10">
+                        <div class="w-full">
+                            <h3 class="sports-font text-2xl md:text-3xl tracking-widest uppercase arc-text text-yellow-400 drop-shadow-md">DE JONG</h3>
+                            <div class="text-7xl md:text-[7rem] leading-none num-font text-yellow-400 drop-shadow-[0_4px_4px_rgba(0,0,0,0.8)] font-black my-2 md:my-4">21</div>
+                            <span class="bg-yellow-400 text-black sports-font px-2 py-1 md:px-3 rounded-sm text-sm md:text-lg">CM</span>
+                        </div>
+                        
+                        <div class="w-full bg-black/90 p-3 md:p-4 rounded-sm border border-gray-700 mt-6 backdrop-blur-md">
+                            <div class="flex justify-between items-center mb-3 md:mb-4 text-xs md:text-sm border-b border-gray-800 pb-2">
+                                <span class="sports-font text-gray-400 text-base md:text-lg">EST. VALUE</span>
+                                <span class="num-font text-[#00FF9C] text-lg md:text-xl font-bold">€85M</span>
+                            </div>
+                            <button class="bid-btn w-full py-2 md:py-3 bg-[#1a1a1a] border border-gray-600 hover:border-[#00FF9C] hover:text-[#00FF9C] transition-colors rounded-sm sports-font text-lg md:text-xl tracking-wider">
+                                SUBMIT BID
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Auction Jersey 3 -->
+                <div class="glass-panel overflow-hidden border border-gray-700 relative group bg-gradient-to-r from-black via-[#00529F] to-black hover:border-[#00FF9C] transition-colors rounded-sm">
+                    <div class="absolute inset-0 jersey-mesh opacity-30"></div>
+                    <div class="absolute top-0 left-1/2 -translate-x-1/2 w-20 md:w-24 h-5 md:h-6 bg-black rounded-b-full border-b border-gray-600 z-10"></div>
+                    
+                    <div class="relative z-10 p-5 md:p-6 flex flex-col h-full items-center justify-between text-center pt-8 md:pt-10">
+                        <div class="w-full">
+                            <h3 class="sports-font text-2xl md:text-3xl tracking-widest uppercase arc-text text-white drop-shadow-md">BASTONI</h3>
+                            <div class="text-7xl md:text-[7rem] leading-none num-font text-white drop-shadow-[0_4px_4px_rgba(0,0,0,0.8)] font-black my-2 md:my-4">95</div>
+                            <span class="bg-blue-500 text-white sports-font px-2 py-1 md:px-3 rounded-sm text-sm md:text-lg">CB</span>
+                        </div>
+                        
+                        <div class="w-full bg-black/90 p-3 md:p-4 rounded-sm border border-gray-700 mt-6 backdrop-blur-md">
+                            <div class="flex justify-between items-center mb-3 md:mb-4 text-xs md:text-sm border-b border-gray-800 pb-2">
+                                <span class="sports-font text-gray-400 text-base md:text-lg">EST. VALUE</span>
+                                <span class="num-font text-[#00FF9C] text-lg md:text-xl font-bold">€70M</span>
+                            </div>
+                            <button class="bid-btn w-full py-2 md:py-3 bg-[#1a1a1a] border border-gray-600 hover:border-[#00FF9C] hover:text-[#00FF9C] transition-colors rounded-sm sports-font text-lg md:text-xl tracking-wider">
+                                SUBMIT BID
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Auction Jersey 4 -->
+                <div class="glass-panel overflow-hidden border border-gray-700 relative group bg-[#EF0107] hover:border-[#00FF9C] transition-colors rounded-sm">
+                    <div class="absolute inset-0 jersey-mesh opacity-30"></div>
+                    <div class="absolute top-0 left-1/2 -translate-x-1/2 w-20 md:w-24 h-5 md:h-6 bg-white rounded-b-full border-b border-gray-600 z-10"></div>
+                    
+                    <div class="relative z-10 p-5 md:p-6 flex flex-col h-full items-center justify-between text-center pt-8 md:pt-10">
+                        <div class="w-full">
+                            <h3 class="sports-font text-2xl md:text-3xl tracking-widest uppercase arc-text text-white drop-shadow-md">SAKA</h3>
+                            <div class="text-7xl md:text-[7rem] leading-none num-font text-white drop-shadow-[0_4px_4px_rgba(0,0,0,0.8)] font-black my-2 md:my-4">7</div>
+                            <span class="bg-white text-black sports-font px-2 py-1 md:px-3 rounded-sm text-sm md:text-lg">RW</span>
+                        </div>
+                        
+                        <div class="w-full bg-black/90 p-3 md:p-4 rounded-sm border border-gray-700 mt-6 backdrop-blur-md">
+                            <div class="flex justify-between items-center mb-3 md:mb-4 text-xs md:text-sm border-b border-gray-800 pb-2">
+                                <span class="sports-font text-gray-400 text-base md:text-lg">EST. VALUE</span>
+                                <span class="num-font text-[#00FF9C] text-lg md:text-xl font-bold">€120M</span>
+                            </div>
+                            <button class="bid-btn w-full py-2 md:py-3 bg-[#1a1a1a] border border-gray-600 hover:border-[#00FF9C] hover:text-[#00FF9C] transition-colors rounded-sm sports-font text-lg md:text-xl tracking-wider">
+                                SUBMIT BID
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 8. TACTICS BOARD (T-SHIRT ICONS) & SQUAD SUBMISSION -->
+        <section class="reveal grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+            <div class="order-2 lg:order-1 relative p-2 md:p-4">
+                <div class="absolute inset-0 bg-black/50 blur-xl rounded-full z-0"></div>
+                <!-- CSS Drawn Pitch -->
+                <div class="pitch relative z-10 w-full max-w-[500px] mx-auto">
+                    <div class="pitch-lines">
+                        <div class="halfway-line"></div>
+                        <div class="center-circle"></div>
+                        <div class="penalty-box-top"></div>
+                        <div class="penalty-box-bottom"></div>
+                    </div>
+                    
+                    <!-- 4-3-3 Formation Jerseys (Responsive Positioning) -->
+                    <!-- GK -->
+                    <div class="player-shirt clip-jersey bg-[#00AFFF]" style="bottom: 5%; left: 50%;" title="Goalkeeper"><span>1</span></div>
+                    
+                    <!-- Defenders -->
+                    <div class="player-shirt clip-jersey" style="bottom: 22%; left: 15%;" title="Left Back"><span>3</span></div>
+                    <div class="player-shirt clip-jersey" style="bottom: 18%; left: 38%;" title="Center Back"><span>4</span></div>
+                    <div class="player-shirt clip-jersey" style="bottom: 18%; left: 62%;" title="Center Back"><span>5</span></div>
+                    <div class="player-shirt clip-jersey" style="bottom: 22%; left: 85%;" title="Right Back"><span>2</span></div>
+                    
+                    <!-- Midfielders -->
+                    <div class="player-shirt clip-jersey" style="bottom: 45%; left: 28%;" title="Center Mid"><span>8</span></div>
+                    <div class="player-shirt clip-jersey" style="bottom: 38%; left: 50%;" title="Defensive Mid"><span>6</span></div>
+                    <div class="player-shirt clip-jersey" style="bottom: 45%; left: 72%;" title="Center Mid"><span>10</span></div>
+                    
+                    <!-- Forwards -->
+                    <div class="player-shirt clip-jersey" style="top: 25%; left: 25%;" title="Left Wing"><span>11</span></div>
+                    <div class="player-shirt clip-jersey" style="top: 18%; left: 50%;" title="Striker"><span>9</span></div>
+                    <div class="player-shirt clip-jersey" style="top: 25%; left: 75%;" title="Right Wing"><span>7</span></div>
+                </div>
+            </div>
+            
+            <div class="order-1 lg:order-2">
+                <h2 class="text-4xl md:text-7xl mb-4 md:mb-6 sports-font text-white border-b border-gray-800 pb-2 md:pb-4">TACTICAL <span class="text-[#00AFFF]">SETUP</span></h2>
+                <p class="text-gray-300 text-sm md:text-lg mb-6 md:mb-8 leading-relaxed">
+                    A successful manager doesn't just buy players; they build a system. Submit your final squad list and your locker-room tactical briefing.
+                </p>
+                
+                <div class="bg-[#111] p-5 md:p-6 mb-6 md:mb-8 border-l-4 border-l-[#00FF9C] rounded-sm shadow-lg">
+                    <h4 class="sports-font text-xl md:text-2xl mb-3 md:mb-4 text-[#00FF9C]">Judging Criteria</h4>
+                    <ul class="text-gray-300 space-y-2 md:space-y-3 font-semibold text-sm md:text-base">
+                        <li class="flex items-center gap-3"><i data-lucide="check-square" class="text-[#00FF9C] w-4 h-4 md:w-5 md:h-5 shrink-0"></i> <span>Squad depth and positional balance</span></li>
+                        <li class="flex items-center gap-3"><i data-lucide="check-square" class="text-[#00FF9C] w-4 h-4 md:w-5 md:h-5 shrink-0"></i> <span>Strategic logic behind transfers</span></li>
+                        <li class="flex items-center gap-3"><i data-lucide="check-square" class="text-[#00FF9C] w-4 h-4 md:w-5 md:h-5 shrink-0"></i> <span>Key player partnerships mapped out</span></li>
+                        <li class="flex items-center gap-3"><i data-lucide="check-square" class="text-[#00FF9C] w-4 h-4 md:w-5 md:h-5 shrink-0"></i> <span>Clear tactical formation and idea</span></li>
+                    </ul>
+                </div>
+                
+                <a href="https://docs.google.com/forms/d/e/1FAIpQLSe0hIcfLeqoIcGPIkiZO6V5cfU85g8nNAgFjAdWMBBeDRLHMw/viewform" target="_blank" class="btn-sport flex justify-center w-full text-lg md:text-2xl py-3 md:py-4 decoration-transparent">
+                    <span>LOCK IN FINAL XI / REGISTER</span>
+                </a>
+            </div>
+        </section>
+
+        <!-- 8. RULE BOOK (CAREER MODE THEME) -->
+        <section class="reveal max-w-5xl mx-auto w-full">
+            <h2 class="text-4xl md:text-6xl mb-6 md:mb-12 text-center sports-font">Official Rule Book</h2>
+            
+            <div class="flex flex-col md:flex-row gap-0 glass-panel border border-gray-700 rounded-sm overflow-hidden shadow-2xl relative">
+                <!-- EA FC style accent line -->
+                <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#00FF9C] to-[#00AFFF] z-20"></div>
+                
+                <!-- Sidebar Tabs (Scrollable horizontally on mobile) -->
+                <div class="w-full md:w-1/3 bg-black/90 border-b md:border-b-0 md:border-r border-gray-800 flex flex-row md:flex-col overflow-x-auto md:overflow-visible z-10 scrollbar-hide">
+                    <div class="hidden md:block p-6 border-b border-gray-800">
+                        <h3 class="sports-font text-gray-500 text-lg tracking-widest">MANAGER INBOX</h3>
+                    </div>
+                    
+                    <button class="rule-tab active px-4 md:px-6 py-4 md:py-6 text-left sports-font text-base md:text-xl border-b-2 md:border-b-0 md:border-l-4 border-transparent transition-all text-gray-400 flex justify-between items-center group whitespace-nowrap shrink-0" onclick="switchRuleTab(this, 'rule1')">
+                        <span>1. Objective & Guidelines</span>
+                        <i data-lucide="target" class="text-gray-500 opacity-50 group-hover:scale-110 transition-all hidden md:block w-5 h-5"></i>
+                    </button>
+                    <button class="rule-tab px-4 md:px-6 py-4 md:py-6 text-left sports-font text-base md:text-xl border-b-2 md:border-b-0 md:border-l-4 border-transparent hover:border-gray-500 hover:bg-white/5 transition-all text-gray-400 flex justify-between items-center group whitespace-nowrap shrink-0" onclick="switchRuleTab(this, 'rule2')">
+                        <span>2. Transfer Window</span>
+                        <i data-lucide="arrow-left-right" class="text-gray-500 opacity-50 group-hover:scale-110 transition-all hidden md:block w-5 h-5"></i>
+                    </button>
+                    <button class="rule-tab px-4 md:px-6 py-4 md:py-6 text-left sports-font text-base md:text-xl border-b-2 md:border-b-0 md:border-l-4 border-transparent hover:border-gray-500 hover:bg-white/5 transition-all text-gray-400 flex justify-between items-center group whitespace-nowrap shrink-0" onclick="switchRuleTab(this, 'rule3')">
+                        <span>3. Sealed-Bid Auction</span>
+                        <i data-lucide="gavel" class="text-gray-500 opacity-50 group-hover:scale-110 transition-all hidden md:block w-5 h-5"></i>
+                    </button>
+                </div>
+                
+                <!-- Content Area -->
+                <div class="w-full md:w-2/3 p-6 md:p-12 bg-gradient-to-br from-[#111] to-[#050505] relative min-h-[300px] md:min-h-[400px]">
+                    <!-- Decorative watermark -->
+                    <i data-lucide="shield" class="absolute right-[-20px] bottom-[-20px] w-64 h-64 md:w-80 md:h-80 text-white opacity-[0.03] z-0 pointer-events-none"></i>
+
+                    <div id="rule1" class="rule-content active block animate-fadeIn relative z-10">
+                        <div class="flex items-center gap-3 md:gap-4 mb-4 md:mb-6 border-b border-gray-800 pb-3 md:pb-4">
+                            <div class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-[#00FF9C]/10 flex items-center justify-center border border-[#00FF9C]/30 shrink-0">
+                                <i data-lucide="target" class="text-[#00FF9C] w-5 h-5 md:w-6 md:h-6"></i>
+                            </div>
+                            <h3 class="sports-font text-2xl md:text-4xl text-[#00FF9C]">Objective & Guidelines</h3>
+                        </div>
+                        <ul class="space-y-3 md:space-y-4 text-gray-300 font-medium text-sm md:text-lg">
+                            <li class="flex items-start gap-3 md:gap-4">
+                                <i data-lucide="chevron-right" class="w-5 h-5 md:w-6 md:h-6 text-[#00AFFF] shrink-0 mt-0.5"></i> 
+                                <span>Teams act as football club managers to build the strongest squad possible.</span>
+                            </li>
+                            <li class="flex items-start gap-3 md:gap-4">
+                                <i data-lucide="chevron-right" class="w-5 h-5 md:w-6 md:h-6 text-[#00AFFF] shrink-0 mt-0.5"></i> 
+                                <span>Represent one global powerhouse club from Europe's Top 5 Leagues.</span>
+                            </li>
+                            <li class="flex items-start gap-3 md:gap-4">
+                                <i data-lucide="chevron-right" class="w-5 h-5 md:w-6 md:h-6 text-[#00AFFF] shrink-0 mt-0.5"></i> 
+                                <span>A player can belong to only one club and be transferred only once throughout the event.</span>
+                            </li>
+                            <li class="flex items-start gap-3 md:gap-4">
+                                <i data-lucide="chevron-right" class="w-5 h-5 md:w-6 md:h-6 text-[#00AFFF] shrink-0 mt-0.5"></i> 
+                                <span>All transfers must be officially recorded. No negative budget allowed.</span>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <div id="rule2" class="rule-content hidden animate-fadeIn relative z-10">
+                        <div class="flex items-center gap-3 md:gap-4 mb-4 md:mb-6 border-b border-gray-800 pb-3 md:pb-4">
+                            <div class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-[#00AFFF]/10 flex items-center justify-center border border-[#00AFFF]/30 shrink-0">
+                                <i data-lucide="arrow-left-right" class="text-[#00AFFF] w-5 h-5 md:w-6 md:h-6"></i>
+                            </div>
+                            <h3 class="sports-font text-2xl md:text-4xl text-[#00AFFF]">Transfer Window</h3>
+                        </div>
+                        <ul class="space-y-3 md:space-y-4 text-gray-300 font-medium text-sm md:text-lg">
+                            <li class="flex items-start gap-3 md:gap-4">
+                                <i data-lucide="chevron-right" class="w-5 h-5 md:w-6 md:h-6 text-[#00FF9C] shrink-0 mt-0.5"></i> 
+                                <span>Teams can trade or buy players from each other within strict budget constraints.</span>
+                            </li>
+                            <li class="flex items-start gap-3 md:gap-4">
+                                <i data-lucide="chevron-right" class="w-5 h-5 md:w-6 md:h-6 text-[#00FF9C] shrink-0 mt-0.5"></i> 
+                                <span>Exchange deals (straight swap or swap + cash) are fully permitted to secure targets.</span>
+                            </li>
+                            <li class="flex items-start gap-3 md:gap-4">
+                                <i data-lucide="chevron-right" class="w-5 h-5 md:w-6 md:h-6 text-[#00FF9C] shrink-0 mt-0.5"></i> 
+                                <span>Verbal agreements mean nothing. Once a deal is logged by officials, it is locked.</span>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <div id="rule3" class="rule-content hidden animate-fadeIn relative z-10">
+                        <div class="flex items-center gap-3 md:gap-4 mb-4 md:mb-6 border-b border-gray-800 pb-3 md:pb-4">
+                            <div class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-[#FFD700]/10 flex items-center justify-center border border-[#FFD700]/30 shrink-0">
+                                <i data-lucide="gavel" class="text-[#FFD700] w-5 h-5 md:w-6 md:h-6"></i>
+                            </div>
+                            <h3 class="sports-font text-2xl md:text-4xl text-[#FFD700]">Sealed-Bid Auction</h3>
+                        </div>
+                        <ul class="space-y-3 md:space-y-4 text-gray-300 font-medium text-sm md:text-lg">
+                            <li class="flex items-start gap-3 md:gap-4">
+                                <i data-lucide="chevron-right" class="w-5 h-5 md:w-6 md:h-6 text-[#00AFFF] shrink-0 mt-0.5"></i> 
+                                <span>Organizers announce unchosen superstar players from global leagues.</span>
+                            </li>
+                            <li class="flex items-start gap-3 md:gap-4">
+                                <i data-lucide="chevron-right" class="w-5 h-5 md:w-6 md:h-6 text-[#00AFFF] shrink-0 mt-0.5"></i> 
+                                <span>Teams submit secret (sealed) bids. No one knows what rivals are spending.</span>
+                            </li>
+                            <li class="flex items-start gap-3 md:gap-4">
+                                <i data-lucide="chevron-right" class="w-5 h-5 md:w-6 md:h-6 text-[#00AFFF] shrink-0 mt-0.5"></i> 
+                                <span>Total bids across multiple active players cannot exceed total remaining budget.</span>
+                            </li>
+                            <li class="flex items-start gap-3 md:gap-4">
+                                <i data-lucide="chevron-right" class="w-5 h-5 md:w-6 md:h-6 text-[#00AFFF] shrink-0 mt-0.5"></i> 
+                                <span>Highest bidder secures the player. Ties are resolved by an official coin-toss.</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- FOOTER -->
+        <footer class="mt-8 md:mt-20 border-t-2 border-gray-800 pt-8 pb-6 text-center text-gray-500 reveal bg-black">
+            <h2 class="sports-font text-2xl md:text-4xl mb-1 md:mb-2 text-white tracking-widest">TRANSFER WINDOW</h2>
+            <p class="font-bold text-xs md:text-sm tracking-widest uppercase">Ultimate Club Manager Challenge</p>
+            <p class="mt-4 md:mt-6 text-[10px] md:text-xs">&copy; 2026 University Sports Events. All rights reserved.</p>
+        </footer>
+
+    </div>
+
+    <!-- --- JAVASCRIPT LOGIC --- -->
+    <script>
+        // Initialize Lucide Icons
+        lucide.createIcons();
+
+        // 0. INTRO ANIMATION LOGIC
+        // Lock scrolling during intro animation initially
+        document.body.style.overflow = 'hidden';
+
+        const introOverlay = document.getElementById('intro-overlay');
+        
+        // We use a direct timeout instead of waiting for window.onload. 
+        // This ensures the screen unlocks exactly when the CSS animation finishes (2 seconds), 
+        // regardless of how long the background video takes to load.
+        setTimeout(() => {
+            if (introOverlay) {
+                introOverlay.style.opacity = '0';
+            }
+            // Reset body scroll lock
+            document.body.style.overflow = 'auto';
+            document.body.style.overflowX = 'hidden'; // Keep horizontal scroll locked
+            
+            // Remove from DOM after fade transition completes
+            setTimeout(() => {
+                if (introOverlay) {
+                    introOverlay.remove();
+                }
+            }, 500); 
+        }, 2100); // 2.1 seconds matches the ballFlyIn + flashEffect
+
+        // 1. SCROLL REVEAL & BUDGET ANIMATION
+        const revealElements = document.querySelectorAll('.reveal');
+        let budgetAnimated = false;
+
+        const revealOptions = {
+            threshold: 0.15,
+            rootMargin: "0px 0px -50px 0px"
+        };
+
+        const revealOnScroll = new IntersectionObserver(function(entries, observer) {
+            entries.forEach(entry => {
+                if (!entry.isIntersecting) return;
+                
+                entry.target.classList.add('active');
+                
+                // Trigger budget animation once when visible
+                if(!budgetAnimated && entry.target.querySelector('#budget-fill')) {
+                    budgetAnimated = true;
+                    setTimeout(() => {
+                        const spendPercent = 43; // Simulating 43% spent of 150M (~64.5M)
+                        document.getElementById('budget-fill').style.width = spendPercent + '%';
+                        animateValue("budget-display", 150.0, 85.5, 2000); // 150M -> 85.5M left
+                        animateValue("spent-display", 0.0, 64.5, 2000); // 0 -> 64.5M spent
+                    }, 400);
+                }
+
+                observer.unobserve(entry.target);
+            });
+        }, revealOptions);
+
+        revealElements.forEach(el => revealOnScroll.observe(el));
+
+        // Number animation function
+        function animateValue(id, start, end, duration) {
+            let obj = document.getElementById(id);
+            if(!obj) return;
+            let startTimestamp = null;
+            const step = (timestamp) => {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                const easeProgress = 1 - Math.pow(1 - progress, 3); // cubic ease out
+                const currentVal = (start + (end - start) * easeProgress).toFixed(1);
+                obj.innerHTML = currentVal + 'M';
+                if (progress < 1) {
+                    window.requestAnimationFrame(step);
+                }
+            };
+            window.requestAnimationFrame(step);
+        }
+
+        // 2. GAME THEME RULEBOOK TABS LOGIC
+        function switchRuleTab(btn, targetId) {
+            // Remove active class from all tabs
+            document.querySelectorAll('.rule-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Add active class to clicked tab
+            btn.classList.add('active');
+            
+            // Scroll to the active tab horizontally on mobile
+            if(window.innerWidth < 768) {
+                btn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+            }
+            
+            // Hide all content blocks
+            document.querySelectorAll('.rule-content').forEach(content => {
+                content.classList.remove('block');
+                content.classList.add('hidden');
+            });
+            
+            // Show target content block
+            const targetContent = document.getElementById(targetId);
+            targetContent.classList.remove('hidden');
+            targetContent.classList.add('block');
+            
+            // Re-trigger animation by removing and re-adding class
+            targetContent.classList.remove('animate-fadeIn');
+            void targetContent.offsetWidth; // trigger reflow
+            targetContent.classList.add('animate-fadeIn');
+        }
+
+        // 3. AUCTION BIDDING BUTTONS
+        const bidButtons = document.querySelectorAll('.bid-btn');
+        bidButtons.forEach(btn => {
+            btn.addEventListener('click', function() {
+                if(this.innerText.includes("SUBMITTED")) return;
+                
+                this.innerHTML = '<i data-lucide="loader-2" class="animate-spin inline w-5 h-5 md:w-6 md:h-6 mr-2"></i> PROCESSING...';
+                lucide.createIcons();
+                this.classList.replace('border-gray-600', 'border-[#FFD700]');
+                this.classList.replace('text-white', 'text-[#FFD700]');
+                
+                setTimeout(() => {
+                    this.innerHTML = '<i data-lucide="check-circle" class="inline w-5 h-5 md:w-6 md:h-6 mr-2"></i> BID SUBMITTED';
+                    lucide.createIcons();
+                    this.classList.replace('border-[#FFD700]', 'border-[#00FF9C]');
+                    this.classList.replace('text-[#FFD700]', 'text-[#00FF9C]');
+                    this.style.background = 'rgba(0, 255, 156, 0.15)';
+                }, 1200);
+            });
+        });
+
+    </script>
+</body>
+</html>
